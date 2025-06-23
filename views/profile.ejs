@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <link rel="stylesheet" href="/styles/styleP.css"> <!-- Include your CSS file -->
+</head>
+
+<body>
+    <header>
+        <a href="#" class="logo"><i>WelSpa</i></a>
+        <nav class="navbar">
+            <a href="/home">Home</a>
+            <a href="/about">About</a>
+            <a href="/contact">Contact Us</a>
+            <!-- <a href="/login">LogIn</a> -->
+            <a href="/book">Book Now</a>
+
+        </nav>
+        <div class="icons">
+            <a href="/profile">
+                <div class="fas fa-user" id="search-btn"></div>
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <div class="Welcome">
+            <h1>Welcome, <%= userInfo.name %>!</h1>
+            <p>Your email: <%= userInfo.email %>
+            </p>
+            <button onclick="window.location.href='/logout'">Logout</button>
+            <button onclick="window.location.href='/change-password'">Change Password</button>
+        </div>
+
+        <h2>Liked Packages</h2>
+        <div id="liked-packages" class="liked-packages-section">
+            <% if (likedPackages && likedPackages.length> 0) { %>
+                <div class="liked-packages-grid">
+                    <% likedPackages.forEach(function(pkg) { %>
+                        <div class="liked-package-card">
+                            <div class="img-holder">
+                                <img src="<%= pkg.image_url %>" alt="<%= pkg.name %>" class="package-image" />
+                            </div>
+                            <h3 class="package-name">
+                                <%= pkg.name %>
+                            </h3>
+                            <p class="package-price">$<%= pkg.price %>
+                            </p>
+                            <a href="/book" class="btn-primary">View</a>
+                        </div>
+                        <% }); %>
+                </div>
+                <% } else { %>
+                    <p>No liked packages yet.</p>
+                    <% } %>
+        </div>
+
+
+        <h2>Your Appointments</h2>
+        <section class="appointments-section">
+            <% if (appointments && appointments.length> 0) { %>
+                <ul class="appointment-list">
+                    <% appointments.forEach(function(app) { %>
+                        <li class="appointment-card">
+                            <div class="appointment-info">
+                                <h3>
+                                    <%= app.package_name %>
+                                </h3>
+                                <h4> $<%=app.price%></h4>
+                                <% const dateObj=new Date(app.date); const
+                                    formattedDate=dateObj.toLocaleDateString('en-IN', { year: 'numeric' , month: 'short'
+                                    , day: 'numeric' }); const formattedTime=dateObj.toLocaleTimeString('en-IN', {
+                                    hour: '2-digit' , minute: '2-digit' }); %>
+                                    <p><strong>DATE:</strong>
+                                        <%= formattedDate %>
+                                    </p>
+                                    <p><strong>TIME:</strong>
+                                        <%= formattedTime %>
+                                    </p>
+                                    <button onclick="cancelAppointment(<%= app.id %>)"
+                                        class="cancel-btn">Cancel</button>
+                            </div>
+                        </li>
+                        <% }); %>
+                </ul>
+                <% } else { %>
+                    <strong>No appointments found.</strong>
+                    <% } %>
+        </section>
+    </main>
+
+</body>
+<!-- <script src="/public/scripts/scripts.js"></script>  -->
+<script>
+    function cancelAppointment(appointmentId) {
+        if (!confirm("Are you sure you want to cancel this appointment?")) return;
+
+        fetch('/cancel-appointment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: appointmentId })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove the appointment card from the DOM
+                    const card = document.querySelector(`button[onclick="cancelAppointment(${appointmentId})"]`).closest('.appointment-card');
+                    if (card) card.remove();
+                    alert("Appointment cancelled!");
+                } else {
+                    alert("Failed to cancel appointment.");
+                }
+            })
+            .catch(() => alert("Error cancelling appointment."));
+    }
+</script>
+
+</html>

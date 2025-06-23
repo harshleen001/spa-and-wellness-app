@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="./styles/styleAP.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <header>
+        <a href="#" class="logo"><i>WelSpa</i></a>
+        <nav class="navbar">
+            <a href="/home">Home</a>
+            <a href="/about">About</a>
+            <a href="/contact">Contact Us</a>
+            <!-- <a href="/login">LogIn</a> -->
+            <a href="/book">Book Now</a>
+            
+        </nav>
+       <div class="icons">
+            <a href="/profile"><div class="fas fa-user" id="search-btn"></div></a>
+        </div>
+    </header>
+    <!-- Main Section -->
+    <section class="appointment">
+        <div class="form-wrapper">
+        <h2>Book an Appointment</h2>
+        <h3 id="selectedPackage"></h3> <!-- This will display the selected package name -->
+        <form class="appointmentForm" id="appointmentForm" action="/appointment" method="POST">
+            <input type="hidden" id="packageId" /> <!-- Hidden field for package ID -->
+            <input type="text" id="name" placeholder="Your Name" required />
+            <input type="datetime-local" id="dateTime" required />
+            <textarea id="notes" placeholder="Additional Notes"></textarea>
+            <button type="submit">Confirm Appointment</button>
+        </form>
+        </div>
+    </section>  
+</body>
+<script>
+    // Extract package details from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const packageId = urlParams.get("packageId");
+    const packageName = urlParams.get("packageName");
+
+    // Display package name and set hidden input
+    if (packageId && packageName) {
+        document.getElementById("selectedPackage").innerText = `Booking for: ${packageName}`;
+        document.getElementById("packageId").value = packageId;
+    }
+
+    // Handle form submission
+    document.getElementById("appointmentForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const name = document.getElementById("name").value;
+        const dateTime = document.getElementById("dateTime").value;
+        const notes = document.getElementById("notes").value;
+
+        const response = await fetch("/api/appointments", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ packageId, packageName, name, dateTime, notes })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            alert("Appointment booked successfully!");
+            window.location.href = "/profile"; // Redirect to profile page
+        } else {
+            alert("Failed to book appointment");
+        }
+    });
+</script>
+</html>
