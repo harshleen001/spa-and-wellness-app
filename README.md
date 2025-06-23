@@ -30,7 +30,7 @@ npm start
 yarn start
 ```
 
-Visit [http://localhost:3000](http://localhost:8080) in your browser to view the website.
+Visit [http://localhost:8080](http://localhost:8080) in your browser to view the website.
 
 ## Features
 
